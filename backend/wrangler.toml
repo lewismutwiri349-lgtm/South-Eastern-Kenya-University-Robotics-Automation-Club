@@ -1,0 +1,34 @@
+name = "robotics-club-api"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+[dev]
+port = 8787
+
+[vars]
+FRONTEND_URL = "http://localhost:3000"
+ENVIRONMENT = "development"
+
+# RESEND_API_KEY is a secret, not a var — set via `.dev.vars` locally
+# (see .dev.vars.example) and `wrangler secret put RESEND_API_KEY` in
+# staging/production. Never committed.
+
+# Local dev D1 binding. Placeholder database_id — replaced with a real
+# Cloudflare-provisioned D1 database when the Auth module needs real tables.
+[[d1_databases]]
+binding = "DB"
+database_name = "robotics-club-db-dev"
+database_id = "local-placeholder"
+
+[env.staging]
+name = "robotics-club-api-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+[env.production]
+name = "robotics-club-api-production"
+
+[env.production.vars]
+ENVIRONMENT = "production"

@@ -1,0 +1,7 @@
+/**
+ * Schema barrel file. Per docs/03_Technical_Architecture.md §6, one schema
+ * file per domain (e.g. `identity.ts`, `membership.ts`, `projects.ts`),
+ * re-exported here.
+ */
+
+export * from "./identity";
