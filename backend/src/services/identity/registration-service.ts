@@ -4,6 +4,7 @@ import { createDb } from "../../db/client";
 import { hashPassword } from "./password";
 import { generateToken, hashToken } from "./tokens";
 import { sendVerificationEmail } from "./email-service";
+import { recordIdentityAuditEvent } from "./audit-service";
 import type { Env } from "../../types/env";
 import type { RegisterInput } from "../../schemas/identity";
 
@@ -41,6 +42,8 @@ export async function registerUser(
     createdAt: now,
     updatedAt: now,
   });
+
+  await recordIdentityAuditEvent(env, { action: "account_registered", targetUserId: userId });
 
   await issueVerificationToken(env, userId, input.email, input.firstName, now);
 

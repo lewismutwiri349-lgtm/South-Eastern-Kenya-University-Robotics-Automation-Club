@@ -3,11 +3,13 @@ import { zValidator } from "@hono/zod-validator";
 import { requestPasswordResetSchema } from "../../schemas/identity";
 import { requestPasswordReset } from "../../services/identity/password-reset-service";
 import type { Env } from "../../types/env";
+import { identityRateLimit } from "../../middleware/identity-rate-limit";
 
 export const requestPasswordResetRoute = new Hono<{ Bindings: Env }>();
 
 requestPasswordResetRoute.post(
   "/",
+  identityRateLimit,
   zValidator("json", requestPasswordResetSchema),
   async (c) => {
     const { email } = c.req.valid("json");

@@ -37,6 +37,8 @@ export const users = sqliteTable("users", {
   lastName: text("last_name").notNull(),
   role: text("role").notNull().default(DEFAULT_USER_ROLE),
   emailVerifiedAt: integer("email_verified_at", { mode: "timestamp" }),
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: integer("locked_until", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -61,6 +63,48 @@ export const emailVerificationTokens = sqliteTable(
     userIdIdx: index("email_verification_tokens_user_id_idx").on(table.userId),
     // Every lookup is WHERE tokenHash = ? — this is the index that matters most.
     tokenHashIdx: uniqueIndex("email_verification_tokens_token_hash_idx").on(table.tokenHash),
+  })
+);
+
+/**
+ * Append-only security record for Identity actions. Application code never
+ * exposes update or delete operations for this table.
+ */
+export const identityAuditLogs = sqliteTable(
+  "identity_audit_logs",
+  {
+    id: text("id").primaryKey(),
+    actorUserId: text("actor_user_id").references(() => users.id),
+    targetUserId: text("target_user_id").references(() => users.id),
+    action: text("action").notNull(),
+    metadata: text("metadata"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    actorUserIdIdx: index("identity_audit_logs_actor_user_id_idx").on(table.actorUserId),
+    targetUserIdIdx: index("identity_audit_logs_target_user_id_idx").on(table.targetUserId),
+    createdAtIdx: index("identity_audit_logs_created_at_idx").on(table.createdAt),
+  })
+);
+
+/**
+ * Short-lived counters for sensitive unauthenticated Identity routes. The
+ * identifier is a SHA-256 digest, so application data never retains a raw IP.
+ */
+export const identityRateLimits = sqliteTable(
+  "identity_rate_limits",
+  {
+    id: text("id").primaryKey(),
+    route: text("route").notNull(),
+    identifierHash: text("identifier_hash").notNull(),
+    requestCount: integer("request_count").notNull(),
+    windowStartedAt: integer("window_started_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    routeIdentifierIdx: uniqueIndex("identity_rate_limits_route_identifier_idx").on(
+      table.route,
+      table.identifierHash
+    ),
   })
 );
 

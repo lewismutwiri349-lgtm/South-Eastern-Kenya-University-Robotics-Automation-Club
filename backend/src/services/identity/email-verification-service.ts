@@ -3,6 +3,7 @@ import { users, emailVerificationTokens } from "../../../../database/schema";
 import { createDb } from "../../db/client";
 import { hashToken } from "./tokens";
 import type { Env } from "../../types/env";
+import { recordIdentityAuditEvent } from "./audit-service";
 
 export class InvalidVerificationTokenError extends Error {
   constructor() {
@@ -42,4 +43,5 @@ export async function verifyEmailToken(env: Env, rawToken: string): Promise<void
 
   // Token is single-use — removed once consumed.
   await db.delete(emailVerificationTokens).where(eq(emailVerificationTokens.id, tokenRow.id));
+  await recordIdentityAuditEvent(env, { action: "email_verified", actorUserId: tokenRow.userId });
 }

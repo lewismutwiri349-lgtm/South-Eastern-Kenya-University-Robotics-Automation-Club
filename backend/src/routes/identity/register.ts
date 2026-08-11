@@ -3,10 +3,11 @@ import { zValidator } from "@hono/zod-validator";
 import { registerSchema } from "../../schemas/identity";
 import { registerUser, EmailAlreadyRegisteredError } from "../../services/identity/registration-service";
 import type { Env } from "../../types/env";
+import { identityRateLimit } from "../../middleware/identity-rate-limit";
 
 export const registerRoute = new Hono<{ Bindings: Env }>();
 
-registerRoute.post("/", zValidator("json", registerSchema), async (c) => {
+registerRoute.post("/", identityRateLimit, zValidator("json", registerSchema), async (c) => {
   const input = c.req.valid("json");
 
   try {

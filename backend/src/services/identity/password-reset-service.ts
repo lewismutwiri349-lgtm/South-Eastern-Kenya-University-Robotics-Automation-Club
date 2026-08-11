@@ -6,6 +6,7 @@ import { generateToken, hashToken } from "./tokens";
 import { sendPasswordResetEmail } from "./email-service";
 import { revokeAllSessionsForUser } from "./session-service";
 import type { Env } from "../../types/env";
+import { recordIdentityAuditEvent } from "./audit-service";
 
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 60; // 1 hour — shorter than email
 // verification since a password reset link is more sensitive if leaked.
@@ -104,4 +105,5 @@ export async function resetPassword(
   // A stolen session shouldn't survive the legitimate owner reclaiming
   // their account via password reset.
   await revokeAllSessionsForUser(env, tokenRow.userId);
+  await recordIdentityAuditEvent(env, { action: "password_reset", actorUserId: tokenRow.userId });
 }
