@@ -3,6 +3,8 @@ import { cors } from "hono/cors";
 import type { Env } from "./types/env";
 import { healthRoute } from "./routes/health";
 import { identityRoutes } from "./routes/identity";
+import { newsRoutes } from "./routes/news";
+import { eventsRoutes } from "./routes/events";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -20,6 +22,8 @@ app.use(
 
 app.route("/api/health", healthRoute);
 app.route("/api/identity", identityRoutes);
+app.route("/api/news", newsRoutes);
+app.route("/api/events", eventsRoutes);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 

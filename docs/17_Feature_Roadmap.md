@@ -10,9 +10,9 @@ reordering is an explicit decision, not silent drift (per
 - [ ] Module 1: Project Scaffolding — repo skeleton, `04_Database_Design.md`, `05_API_Standards.md`
 
 ## Phase 1 — Identity & Access
-- [ ] Auth: registration, login, email verification, password reset
-- [ ] RBAC implementation + `07_User_Roles.md`
-- [ ] Session management, account lockout, audit log foundation
+- [x] Auth: registration, login, email verification, password reset
+- [x] RBAC implementation + `07_User_Roles.md`
+- [x] Session management, account lockout, audit log foundation
 
 ## Phase 2 — Public Website
 - [ ] Home, About, Divisions

@@ -5,3 +5,5 @@
  */
 
 export * from "./identity";
+export * from "./news";
+export * from "./events";

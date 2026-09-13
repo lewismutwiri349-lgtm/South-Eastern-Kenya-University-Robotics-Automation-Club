@@ -63,6 +63,42 @@ that domain is actually built.
 | `POST /api/identity/reset-password` | Anyone with a valid token |
 | `GET /api/identity/users` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary` — minimal roster visibility; full user management (search/filter/pagination) belongs to the future Admin dashboard module |
 
+### News Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/news` | Anyone (unauthenticated) |
+| `GET /api/news/:slug` | Anyone (unauthenticated) |
+| `POST /api/news` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/news/:id` | Same |
+| `POST /api/news/:id/publish` | Same |
+| `DELETE /api/news/:id` | Same |
+
+No per-author ownership restriction — any author-role user can edit or
+delete any article, not just their own. See `docs/modules/news.md` §5.
+(This table was missing despite `docs/modules/news.md` §5 referencing it —
+added 2026-08-14 while adding the Events table below.)
+
+### Events Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/events` | Anyone (unauthenticated) |
+| `GET /api/events/:slug` | Anyone (unauthenticated) |
+| `POST /api/events` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/events/:id` | Same |
+| `POST /api/events/:id/publish` | Same |
+| `DELETE /api/events/:id` | Same |
+| `GET /api/events/:id/registrations` | Same |
+| `POST /api/events/:id/register` | Any authenticated user |
+| `POST /api/events/:id/cancel-registration` | Any authenticated user (self-service — own registration only) |
+| `GET /api/events/:id/registrations/me` | Any authenticated user |
+
+Content-management routes deliberately reuse News's role set rather than
+inventing an Events-specific role — see `docs/modules/events.md` §5.
+Registration routes are deliberately **not** gated to those roles —
+registering is a member action, not a content-management action; see
+`docs/modules/events.md` §5 and §10.1 (added 2026-08-15, confirmed with
+Lewis).
+
 ## 5. Testing Requirement
 Per `docs/10_Testing_Standards.md` §3, every role-gated route needs tests
 asserting: unauthenticated → 401, authenticated-but-wrong-role → 403,

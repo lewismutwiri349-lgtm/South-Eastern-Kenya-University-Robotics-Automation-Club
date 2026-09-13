@@ -65,6 +65,31 @@ future public page that fetches genuinely dynamic backend data (Events,
 Projects, Awards) — static-by-default is usually right for marketing
 content, wrong for anything that changes independently of a deploy.
 
+**Found 2026-09-10, while starting Phase 2 (Public Website) frontend
+work** — despite the manual E2E validation above, the News API was
+actually unreachable in the merged tree:
+- `database/schema/index.ts` only re-exported `./identity`, not `./news`
+  — broke `newsArticles` at both the type level and at runtime for any
+  query using it.
+- `newsRoutes` was fully built and correctly composed internally, but
+  `backend/src/index.ts` never mounted it — `/api/news` 404'd
+  unconditionally.
+- A leftover 0-byte Module-0 scaffold stub, `backend/src/routes/news.ts`,
+  collided with the real `backend/src/routes/news/` directory and made
+  `import { newsRoutes } from "./routes/news"` resolve to the empty file
+  once the mount line above was added — same collision risk exists today
+  for `events.ts`, `projects.ts`, and `awards.ts` stubs against their
+  future real directories.
+
+All three fixed together (one barrel export line, one mount line, one
+dead-file deletion) and verified with a real request/response loop: local
+D1 migrated fresh, `wrangler dev` + `next start` both running, a real
+article inserted directly into D1, confirmed visible via `GET /api/news`,
+the `/news` list page, and the `/news/:slug` detail page. The manual E2E
+note above evidently predates one of these regressions — kept as-is
+rather than rewritten, since the point of this section is an honest
+record of what actually broke and when.
+
 ## 9. Future Improvements
 - Per-author ownership restriction on edit/delete.
 - Rich text / markdown rendering for article body (currently plain text).
