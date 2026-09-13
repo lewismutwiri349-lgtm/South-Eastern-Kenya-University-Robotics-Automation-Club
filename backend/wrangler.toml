@@ -14,21 +14,58 @@ ENVIRONMENT = "development"
 # (see .dev.vars.example) and `wrangler secret put RESEND_API_KEY` in
 # staging/production. Never committed.
 
-# Local dev D1 binding. Placeholder database_id — replaced with a real
-# Cloudflare-provisioned D1 database when the Auth module needs real tables.
+# ── D1 — default/local environment ──────────────────────────────────────
+# `database_id = "local-placeholder"` is fine for `wrangler dev --local`
+# (used by every `npm test` / local verification in this repo so far) —
+# it's just a key for local SQLite state, never a real API call. It is
+# NOT fine for `wrangler dev` in remote mode or a bare `wrangler deploy`
+# with no --env flag — either will fail (or worse, silently write nowhere
+# useful) against this placeholder. To deploy this default environment for
+# real:
+#   1. wrangler login
+#   2. wrangler d1 create robotics-club-db-dev
+#   3. paste the returned database_id below, replacing "local-placeholder"
+#   4. wrangler d1 execute DB --remote --file=../database/migrations/0000_public_slyde.sql
+#      (repeat for every migration file in database/migrations/, in
+#      ascending order — 0000, 0001, 0002, 0003 as of this writing)
 [[d1_databases]]
 binding = "DB"
 database_name = "robotics-club-db-dev"
 database_id = "local-placeholder"
 
+# ── Staging ──────────────────────────────────────────────────────────────
 [env.staging]
 name = "robotics-club-api-staging"
 
 [env.staging.vars]
 ENVIRONMENT = "staging"
+# Set to the real deployed staging frontend URL once it exists (matches
+# CORS's allowed origin in src/index.ts — a mismatch here means every
+# browser-side request from the staging frontend gets silently CORS-blocked).
+FRONTEND_URL = "https://staging-placeholder.example.com"
 
+# Same pattern as the default environment above: create a SEPARATE D1
+# database for staging (docs/03_Technical_Architecture.md §7 — "no shared
+# databases between staging and production, ever") and paste its ID here.
+#   wrangler d1 create robotics-club-db-staging
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "robotics-club-db-staging"
+database_id = "staging-placeholder"
+
+# ── Production ───────────────────────────────────────────────────────────
 [env.production]
 name = "robotics-club-api-production"
 
 [env.production.vars]
 ENVIRONMENT = "production"
+# Set to the real deployed production frontend URL once it exists — same
+# CORS caveat as staging above.
+FRONTEND_URL = "https://production-placeholder.example.com"
+
+# A THIRD, separate D1 database — never reuse staging's or dev's here.
+#   wrangler d1 create robotics-club-db-production
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "robotics-club-db-production"
+database_id = "production-placeholder"

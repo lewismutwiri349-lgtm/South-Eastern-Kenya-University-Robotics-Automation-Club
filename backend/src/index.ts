@@ -9,13 +9,15 @@ import { eventsRoutes } from "./routes/events";
 const app = new Hono<{ Bindings: Env }>();
 
 // CORS per docs/08_Security_Standards.md §5 — whitelist only, no wildcard.
-// Origins list is a placeholder until real staging/production frontend
-// domains exist; local dev origin included so frontend/ can call this
-// during scaffolding testing.
+// Reads the allowed origin from the FRONTEND_URL var (set per-environment
+// in wrangler.toml) rather than a hardcoded localhost origin, so this
+// works correctly once real staging/production frontend URLs exist —
+// previously hardcoded to "http://localhost:3000" only, which would have
+// silently blocked every real cross-origin browser request once deployed.
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:3000"],
+    origin: (origin, c) => (origin === c.env.FRONTEND_URL ? origin : null),
     credentials: true,
   })
 );
