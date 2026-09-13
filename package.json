@@ -12,5 +12,8 @@
     "dev:backend": "npm run dev --workspace=backend",
     "db:generate": "npm run generate --workspace=database",
     "db:migrate": "npm run migrate --workspace=database"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
