@@ -68,4 +68,4 @@ FRONTEND_URL = "https://production-placeholder.example.com"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "robotics-club-db-production"
-database_id = "d7ba6a20-7731-4654-bf32-f8d86316fdbc"
+database_id = "195f1422-3088-43ef-9133-8a449b5e6b95"
