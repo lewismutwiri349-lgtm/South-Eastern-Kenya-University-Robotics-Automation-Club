@@ -42,7 +42,7 @@ ENVIRONMENT = "staging"
 # Set to the real deployed staging frontend URL once it exists (matches
 # CORS's allowed origin in src/index.ts — a mismatch here means every
 # browser-side request from the staging frontend gets silently CORS-blocked).
-FRONTEND_URL = "https://staging-placeholder.example.com"
+FRONTEND_URL = "https://robotics-club-frontend-production.seku.workers.dev"
 
 # Same pattern as the default environment above: create a SEPARATE D1
 # database for staging (docs/03_Technical_Architecture.md §7 — "no shared
@@ -61,7 +61,7 @@ name = "robotics-club-api-production"
 ENVIRONMENT = "production"
 # Set to the real deployed production frontend URL once it exists — same
 # CORS caveat as staging above.
-FRONTEND_URL = "https://robotics-club-frontend-production.seku.workers.dev"
+FRONTEND_URL = "placeholder"
 
 # A THIRD, separate D1 database — never reuse staging's or dev's here.
 #   wrangler d1 create robotics-club-db-production
