@@ -99,6 +99,75 @@ registering is a member action, not a content-management action; see
 `docs/modules/events.md` §5 and §10.1 (added 2026-08-15, confirmed with
 Lewis).
 
+### Projects Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/projects` | Anyone (unauthenticated) |
+| `GET /api/projects/:slug` | Anyone (unauthenticated) |
+| `POST /api/projects` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/projects/:id` | Same |
+| `POST /api/projects/:id/publish` | Same |
+| `DELETE /api/projects/:id` | Same |
+
+Same content-management role set as News and Events — see
+`docs/modules/projects.md` §5.
+
+### Awards Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/awards` | Anyone (unauthenticated) |
+| `GET /api/awards/:slug` | Anyone (unauthenticated) |
+| `POST /api/awards` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/awards/:id` | Same |
+| `POST /api/awards/:id/publish` | Same |
+| `DELETE /api/awards/:id` | Same |
+
+Same content-management role set as News, Events, and Projects — see
+`docs/modules/awards.md` §5.
+
+### Gallery Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/gallery` | Anyone (unauthenticated) |
+| `GET /api/gallery/categories` | Anyone (unauthenticated) |
+| `GET /api/gallery/:slug` | Anyone (unauthenticated) |
+| `POST /api/gallery` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/gallery/:id` | Same |
+| `POST /api/gallery/:id/publish` | Same |
+| `DELETE /api/gallery/:id` | Same |
+
+Same content-management role set as News, Events, Projects and Awards — see
+`docs/modules/gallery.md` §5.
+
+### Resources Domain
+| Route | Allowed roles |
+|---|---|
+| `GET /api/resources` | Anyone (unauthenticated) |
+| `GET /api/resources/categories` | Anyone (unauthenticated) |
+| `GET /api/resources/:slug` | Anyone (unauthenticated) |
+| `POST /api/resources` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `PATCH /api/resources/:id` | Same |
+| `POST /api/resources/:id/publish` | Same |
+| `DELETE /api/resources/:id` | Same |
+
+Same content-management role set — see `docs/modules/resources.md` §5.
+
+### Contact Domain
+The only domain where the public writes and staff read, rather than the
+reverse. There is deliberately no public read path of any kind.
+
+| Route | Allowed roles |
+|---|---|
+| `POST /api/contact` | Anyone (unauthenticated), rate-limited to 5/hour per IP |
+| `GET /api/contact` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary`, `moderator` |
+| `POST /api/contact/:id/handle` | Same |
+| `DELETE /api/contact/:id` | Same |
+
+Inbound enquiries are club correspondence, so the same role set answers
+them. The 401 boundary on `GET` matters more here than elsewhere: the public
+can write to this table, so an accidental public read would expose every
+sender's email address. See `docs/modules/contact.md` §5.
+
 ## 5. Testing Requirement
 Per `docs/10_Testing_Standards.md` §3, every role-gated route needs tests
 asserting: unauthenticated → 401, authenticated-but-wrong-role → 403,

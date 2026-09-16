@@ -5,22 +5,34 @@ commitment to build in this exact order — priorities can shift, but any
 reordering is an explicit decision, not silent drift (per
 `19_Change_Management.md`).
 
-## Phase 0 — Foundation (in progress)
+## Phase 0 — Foundation ✅
 - [x] Handbook documentation (this set)
-- [ ] Module 1: Project Scaffolding — repo skeleton, `04_Database_Design.md`, `05_API_Standards.md`
+- [x] Module 1: Project Scaffolding — repo skeleton, `04_Database_Design.md`, `05_API_Standards.md`
 
-## Phase 1 — Identity & Access
+## Phase 1 — Identity & Access ✅
 - [x] Auth: registration, login, email verification, password reset
 - [x] RBAC implementation + `07_User_Roles.md`
 - [x] Session management, account lockout, audit log foundation
 
-## Phase 2 — Public Website
-- [ ] Home, About, Divisions
-- [ ] News (separate from Events)
-- [ ] Events (registration, countdown, calendar, attendance)
-- [ ] Projects (public-facing listing/detail views)
-- [ ] Awards & Recognition (public view)
-- [ ] Gallery, Resources, Contact
+## Phase 2 — Public Website ✅
+- [x] Frontend app shell — layout, header (with mobile nav), footer, theme system
+- [x] Home, About, Divisions
+- [x] News (separate from Events)
+- [x] Events — content management + registration/waitlisting
+  - [ ] Countdown, calendar view — deferred, presentation-layer only (`docs/modules/events.md` §11)
+  - [ ] Per-event attendance/check-in — deferred; see the scope note below
+- [x] Projects (public-facing listing/detail views)
+- [x] Awards & Recognition (public view)
+- [x] Gallery (public listing/detail, category filter)
+- [x] Resources (curated external links, category filter)
+- [x] Contact (public submission + staff triage API)
+- [x] Identity frontend — login, register, forgot/reset password, verify email
+
+**Scope note — "attendance tracking".** It appears under both Phase 2
+(Events) and Phase 7 (Leadership Dashboard). These are most likely two
+different things — per-event check-in versus ongoing meeting/division
+attendance — and were not assumed to be the same feature. Both remain
+open; flagged in `docs/modules/events.md` §11.
 
 ## Phase 3 — Applicant Portal
 - [ ] Application submission

@@ -29,6 +29,27 @@
       "when": 1786817345939,
       "tag": "0003_violet_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1786818167267,
+      "tag": "0004_peaceful_steve_rogers",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1786890948785,
+      "tag": "0005_icy_risque",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1789546376229,
+      "tag": "0006_cuddly_otto_octavius",
+      "breakpoints": true
     }
   ]
 }

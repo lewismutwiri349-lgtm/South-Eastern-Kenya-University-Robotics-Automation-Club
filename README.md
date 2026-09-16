@@ -1,104 +1,101 @@
-# Awards & Recognition Domain — Phase 2 (Public Website)
+# Robotics & Autonomous Systems Club — Management Platform
 
-Builds on the previous packages (`rasc-events-domain-3c`,
-`rasc-events-registration-3c2`, `rasc-projects-domain-3d`) — independent
-of them otherwise, same as News/Events/Projects (no shared tables/routes).
+A club management platform for the South Eastern Kenya University Robotics &
+Automation Club: a public website (news, events, projects, awards, gallery,
+resources, contact) plus, over time, applicant, member, leadership and admin
+portals.
 
-## Scope call, flagged not silent
+**Start here:** [`docs/00_Project_Constitution.md`](docs/00_Project_Constitution.md).
+It is the single source of truth for how this project is built and extended,
+and it wins over any later decision unless explicitly amended. The full
+engineering handbook lives in [`docs/`](docs/); per-feature documentation
+lives in [`docs/modules/`](docs/modules/).
 
-`recipientName` is **free text**, not a link to a real `users` record.
-Phase 8 owns the actual Awards System (badges, certificates, formal Hall
-of Fame, Engineer/Project of the Month nomination workflows) — tying this
-to a real member account now would mean inventing that relational
-structure ahead of that decision, and a recognition can reasonably go to
-someone who isn't a system user at all. Documented in
-`docs/modules/awards.md` §4.
+## Stack
 
-## New files — copy as-is
+| Piece | What |
+|---|---|
+| `frontend/` | Next.js (App Router) deployed as a Cloudflare Worker via OpenNext |
+| `backend/` | Hono REST API on Cloudflare Workers — the single authoritative API |
+| `database/` | Drizzle ORM schema + migrations against Cloudflare D1, shared by both |
+| `workers/` | Reserved for cron/async jobs (not yet created) |
 
-```
-backend/src/routes/awards/create.ts
-backend/src/routes/awards/delete.ts
-backend/src/routes/awards/get.ts
-backend/src/routes/awards/index.ts
-backend/src/routes/awards/list.ts
-backend/src/routes/awards/publish.ts
-backend/src/routes/awards/update.ts
-backend/src/schemas/awards.ts
-backend/src/services/awards/awards-service.ts
-database/schema/awards.ts
-database/migrations/0005_icy_risque.sql
-database/migrations/meta/0005_snapshot.json
-docs/modules/awards.md
-frontend/app/(public)/awards/page.tsx
-frontend/app/(public)/awards/[slug]/page.tsx
-```
+The frontend never talks to D1 directly — everything goes through the API.
+See [`docs/03_Technical_Architecture.md`](docs/03_Technical_Architecture.md).
 
-## Modified files — overwrite
+## Running locally
 
-```
-backend/src/index.ts               (mounts /api/awards)
-database/schema/index.ts           (adds ./awards export)
-database/migrations/meta/_journal.json
-docs/07_User_Roles.md              (adds Awards Domain table)
-docs/17_Feature_Roadmap.md         (Awards checkbox marked done)
-```
-
-## Delete this one (superseded, now dead)
-
-```
-backend/src/routes/awards.ts   (empty stub — same class of leftover file
-                                 as news.ts/events.ts/projects.ts from
-                                 the earlier packages)
-```
+Requires Node 22+.
 
 ```bash
-git rm backend/src/routes/awards.ts
+npm install          # npm workspaces — installs all three packages
 ```
 
-## Suggested commit
+Backend API (Wrangler local mode, on `http://localhost:8787`):
 
 ```bash
-git add -A
-git commit -m "Phase 2: Awards & Recognition domain (public view)"
+npm run dev:backend
 ```
 
-## What was verified before packaging
+First run only — create the local D1 database and apply every migration in
+ascending order:
 
-- `npx drizzle-kit generate` — clean diff, only the `awards` table added.
-- Applied to local D1 via `wrangler d1 execute DB --local`.
-- `npx tsc --noEmit` clean in both `backend/` and `frontend/`.
-- `npx vitest run` — 24/24 passing (unchanged; no new pure-logic unit
-  tests, same rationale as the other content domains).
-- Full end-to-end against a live local Worker — unauthenticated create
-  (`401`) → create → draft hidden from public list/detail (`404`) →
-  publish → visible on both public endpoints → partial update →
-  soft-delete → confirmed removed from public list. All passed.
-- Full-stack proof against a live local Next.js dev server: a real
-  published award (title, recipient, category, description) rendered
-  correctly by the real `/awards` and `/awards/:slug` SSR pages.
+```bash
+cd backend
+for f in ../database/migrations/0*.sql; do
+  npx wrangler d1 execute DB --local --file="$f"
+done
+```
 
-## A pattern worth a proactive check
+Note: `database/migrations/0000_bitter_maximus.sql` is an orphaned file not
+tracked by `meta/_journal.json` and is never applied in any real
+environment. The loop above will pick it up — skip it, or apply only the
+tags listed in the journal.
 
-This is the fourth domain in a row (News, Events, Projects, Awards) where
-an empty leftover stub route file predated the real route directory and
-had to be found and removed before `tsc` would pass once it got imported.
-I checked for `awards.ts` proactively this time rather than hitting it by
-surprise. The remaining untouched stub files —
-`backend/src/routes/{admin,analytics,applicants,auth,certificates,
-dashboard,divisions,users}.ts` — are all still empty and harmless *until*
-each of those domains gets built and actually imports its real route
-directory, at which point the same failure will happen again. Worth
-knowing about, not worth fixing preemptively (they're currently inert).
+Frontend (on `http://localhost:3000`):
 
-## Next step
+```bash
+npm run dev:frontend
+```
 
-Per the roadmap, the last Phase 2 item is **Gallery, Resources, Contact**
-— likely three small, mostly-static pieces rather than one more full
-content-management domain (worth confirming shape before building,
-since "Gallery" in particular could mean anything from a static image
-grid to another full upload-backed domain). After that, Phase 2 is fully
-closed out and the next real decision is which of Phase 3 (Applicant
-Portal), Phase 4 (Member Portal), or Phase 6 (Admin Dashboard) to tackle
-next — each a meaningfully larger, different body of work than what's
-been built so far.
+The frontend reads the API base URL from `NEXT_PUBLIC_API_BASE_URL` and
+falls back to `http://localhost:8787`.
+
+Email sending (verification, password reset) needs a Resend key. Copy
+`backend/.dev.vars.example` to `backend/.dev.vars` and fill it in — without
+it, registration still works but the verification email fails and is logged.
+
+## Checks
+
+Run from the repo root:
+
+```bash
+npx eslint .                              # lint, all three packages
+npm run --workspace=backend test          # 158 tests, real Workers runtime + local D1
+npx tsc --noEmit --project backend        # backend types
+npx tsc --noEmit --project frontend       # frontend types
+npm run --workspace=database generate     # should report no pending schema changes
+```
+
+Tests run in the real Workers runtime against a real local D1 via
+`@cloudflare/vitest-pool-workers` — not mocks. See
+[`docs/10_Testing_Standards.md`](docs/10_Testing_Standards.md).
+
+## Before deploying
+
+`backend/wrangler.toml` still carries placeholder D1 database IDs for the
+default and staging environments. Deploying against these will fail or write
+nowhere useful. Create a separate D1 database per environment — never share
+one between staging and production — and paste the real IDs in. The file
+has step-by-step instructions inline.
+
+`frontend/lib/club-info.ts` is intentionally blank (club email, location,
+meeting times, socials). Fill it in and the Contact page picks it up with no
+other change.
+
+## Current status
+
+Phase 0 (Foundation), Phase 1 (Identity & Access) and Phase 2 (Public
+Website) are complete. Phases 3+ — Applicant Portal, Member Portal, full
+Project Management, Admin and Leadership dashboards — are not started. See
+[`docs/17_Feature_Roadmap.md`](docs/17_Feature_Roadmap.md).

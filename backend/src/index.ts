@@ -5,6 +5,11 @@ import { healthRoute } from "./routes/health";
 import { identityRoutes } from "./routes/identity";
 import { newsRoutes } from "./routes/news";
 import { eventsRoutes } from "./routes/events";
+import { projectsRoutes } from "./routes/projects";
+import { awardsRoutes } from "./routes/awards";
+import { galleryRoutes } from "./routes/gallery";
+import { resourcesRoutes } from "./routes/resources";
+import { contactRoutes } from "./routes/contact";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -26,6 +31,11 @@ app.route("/api/health", healthRoute);
 app.route("/api/identity", identityRoutes);
 app.route("/api/news", newsRoutes);
 app.route("/api/events", eventsRoutes);
+app.route("/api/projects", projectsRoutes);
+app.route("/api/awards", awardsRoutes);
+app.route("/api/gallery", galleryRoutes);
+app.route("/api/resources", resourcesRoutes);
+app.route("/api/contact", contactRoutes);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 

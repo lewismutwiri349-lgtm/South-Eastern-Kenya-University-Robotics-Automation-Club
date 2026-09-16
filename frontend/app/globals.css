@@ -96,3 +96,65 @@ a {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ── Header / navigation ────────────────────────────────────────────────
+   Inline styles can't express media queries, and the header is the one
+   component in the app that genuinely needs them: nine nav links do not fit
+   on a phone. These classes exist for that reason only — the rest of the UI
+   stays on the inline-style + CSS-custom-property approach described in
+   docs/06_UI_Design_System.md. Breakpoint is 900px, the width at which the
+   full link row starts wrapping. */
+
+.site-nav-desktop {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-family: var(--font-mono);
+}
+
+.site-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.site-nav-mobile {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.site-nav-mobile[data-open="true"] {
+  display: flex;
+}
+
+@media (max-width: 900px) {
+  .site-nav-desktop {
+    display: none;
+  }
+
+  .site-nav-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 901px) {
+  /* Never leave the mobile panel visible if the viewport grows while it's
+     open — otherwise both navs render at once. */
+  .site-nav-mobile[data-open="true"] {
+    display: none;
+  }
+}
