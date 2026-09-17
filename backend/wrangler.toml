@@ -59,9 +59,9 @@ name = "robotics-club-api-production"
 
 [env.production.vars]
 ENVIRONMENT = "production"
-# Set to the real deployed production frontend URL once it exists — same
-# CORS caveat as staging above.
-FRONTEND_URL = "placeholder"
+# Must match the deployed production frontend origin exactly or browser
+# requests will fail the CORS preflight and never reach the API.
+FRONTEND_URL = "https://robotics-club-frontend-production.seku.workers.dev"
 
 # A THIRD, separate D1 database — never reuse staging's or dev's here.
 #   wrangler d1 create robotics-club-db-production
