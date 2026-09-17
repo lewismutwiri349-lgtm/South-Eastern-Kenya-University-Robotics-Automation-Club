@@ -15,25 +15,20 @@ binding = "DB"
 database_name = "robotics-club-db-dev"
 database_id = "local-placeholder"
 
-# ─────────────────────────────────────────────
 # STAGING
-# ─────────────────────────────────────────────
 
 [env.staging]
 name = "robotics-club-api-staging"
 
 [env.staging.vars]
 ENVIRONMENT = "staging"
-FRONTEND_URL = "https://robotics-club-frontend-production.seku.workers.dev"
 
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "robotics-club-db-staging"
 database_id = "staging-placeholder"
 
-# ─────────────────────────────────────────────
 # PRODUCTION
-# ─────────────────────────────────────────────
 
 [env.production]
 name = "robotics-club-api-production"
