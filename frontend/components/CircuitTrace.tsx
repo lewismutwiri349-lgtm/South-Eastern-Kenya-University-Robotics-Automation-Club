@@ -21,7 +21,6 @@ export function CircuitTrace() {
     <svg
       viewBox="0 0 520 200"
       width="100%"
-      height="auto"
       style={{ maxWidth: 520 }}
       role="img"
       aria-label="Diagram of interconnected engineering divisions"
