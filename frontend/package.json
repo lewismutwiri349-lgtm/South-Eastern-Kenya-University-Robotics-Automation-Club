@@ -4,12 +4,13 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "clean": "node -e \"const fs=require('fs'); ['.next','.open-next','.wrangler'].forEach((d)=>fs.rmSync(d,{recursive:true,force:true}));\"",
+    "build": "npm run clean && next build",
     "start": "next start",
     "lint": "next lint",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "npm run clean && opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare deploy"
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy --env production"
   },
   "dependencies": {
     "next": "^15.5.23",
