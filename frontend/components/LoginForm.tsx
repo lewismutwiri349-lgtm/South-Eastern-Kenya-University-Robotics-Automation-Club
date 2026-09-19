@@ -47,7 +47,7 @@ export function LoginForm() {
       // The session is an httpOnly cookie set by the API, so there is
       // nothing to store client-side. `refresh()` makes the server
       // components re-render with the new cookie in play.
-      router.push("/");
+      router.push("/account");
       router.refresh();
     } catch (err) {
       setStatus({ kind: "error", message: messageFor(err) });

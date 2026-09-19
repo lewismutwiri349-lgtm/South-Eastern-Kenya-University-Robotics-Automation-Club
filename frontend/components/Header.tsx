@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV_LINKS = [
@@ -27,6 +28,13 @@ const NAV_LINKS = [
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [me, setMe] = useState<{ firstName: string } | null>(null);
+
+  useEffect(() => {
+    apiFetch<{ data: { firstName: string } }>("/api/identity/me")
+      .then((res) => setMe(res.data))
+      .catch(() => setMe(null));
+  }, [pathname]);
 
   // Close the panel on navigation — without this it stays open over the new
   // page, since client-side routing doesn't remount the header.
@@ -85,10 +93,17 @@ export function Header() {
           ))}
         </nav>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+          }}
+        >
           <ThemeToggle />
+
           <Link
-            href="/login"
+            href={me ? "/account" : "/login"}
             style={{
               fontSize: 14,
               fontFamily: "var(--font-mono)",
@@ -100,7 +115,7 @@ export function Header() {
               whiteSpace: "nowrap",
             }}
           >
-            Sign in
+            {me ? me.firstName : "Sign in"}
           </Link>
 
           <button

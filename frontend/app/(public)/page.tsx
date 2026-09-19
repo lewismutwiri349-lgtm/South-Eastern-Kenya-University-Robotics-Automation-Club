@@ -1,101 +1,49 @@
-import { Button, Card, Container, Designator } from "@/components/ui";
-import { CircuitTrace } from "@/components/CircuitTrace";
+"use client";
 
-const WHAT_WE_DO = [
-  {
-    id: "DES",
-    title: "Design",
-    body: "Every project starts on the whiteboard and in CAD — spec it, simulate it, review it as a team before a single part gets machined.",
-  },
-  {
-    id: "BLD",
-    title: "Build",
-    body: "Divisions share the machine shop, the electronics bench, and the software stack. Nothing gets built alone.",
-  },
-  {
-    id: "CMP",
-    title: "Compete",
-    body: "We enter regional and national robotics competitions every season — real deadlines, real judges, real robots.",
-  },
-  {
-    id: "PUB",
-    title: "Publish",
-    body: "Finished projects go into the public archive: full documentation, source code, and CAD files, open for the next team to build on.",
-  },
-];
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { AuthShell } from "@/components/AuthShell";
+import { apiFetch } from "@/lib/api";
 
-export default function HomePage() {
+type Me = { firstName: string; lastName: string; email: string; role: string };
+
+export default function AccountPage() {
+  const router = useRouter();
+  const [me, setMe] = useState<Me | null>(null);
+
+  useEffect(() => {
+    apiFetch<{ data: Me }>("/api/identity/me")
+      .then((res) => setMe(res.data))
+      .catch(() => router.replace("/login"));
+  }, [router]);
+
+  async function signOut() {
+    try {
+      await apiFetch("/api/identity/logout", { method: "POST" });
+    } finally {
+      router.push("/login");
+    }
+  }
+
   return (
-    <main>
-      <Container style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.1fr 1fr",
-            gap: "var(--space-12)",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <Designator>RASC — EST. STUDENT-RUN ENGINEERING</Designator>
-            <h1 style={{ fontSize: 48, marginTop: "var(--space-3)", letterSpacing: "-0.02em" }}>
-              We build robots that have to actually work.
-            </h1>
-            <p
-              style={{
-                fontSize: 18,
-                color: "var(--text-secondary)",
-                marginTop: "var(--space-4)",
-                maxWidth: 480,
-              }}
-            >
-              Five divisions, one club. From first CAD sketch to competition floor, members ship
-              real hardware and software, not class projects.
-            </p>
-            <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-6)" }}>
-              <Button href="/apply">Apply to join</Button>
-              <Button href="/projects" variant="secondary">
-                View projects
-              </Button>
-            </div>
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <CircuitTrace />
-          </div>
-        </div>
-      </Container>
-
-      <Container style={{ paddingBottom: "var(--space-16)" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "var(--space-4)",
-          }}
-        >
-          {WHAT_WE_DO.map((item) => (
-            <Card key={item.id}>
-              <Designator>{item.id}</Designator>
-              <h3 style={{ fontSize: 18, marginTop: "var(--space-2)" }}>{item.title}</h3>
-              <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
-                {item.body}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </Container>
-
-      <Container style={{ paddingBottom: "var(--space-16)" }}>
-        <Card style={{ textAlign: "center", padding: "var(--space-12)" }}>
-          <h2 style={{ fontSize: 28 }}>Applications for the fall term are open.</h2>
-          <p style={{ color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
-            No prior robotics experience required — every division trains new members.
+    <AuthShell designator="MEMBER PORTAL" title={me ? `Welcome, ${me.firstName}` : "Loading…"}>
+      {me && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <p style={{ margin: 0, fontSize: 14 }}>
+            {me.firstName} {me.lastName} · {me.email}
           </p>
-          <div style={{ marginTop: "var(--space-6)" }}>
-            <Button href="/apply">Start your application</Button>
-          </div>
-        </Card>
-      </Container>
-    </main>
+          <p style={{ margin: 0, fontSize: 14, color: "var(--text-secondary)" }}>
+            Role: {me.role}
+          </p>
+          <button
+            type="button"
+            onClick={signOut}
+            style={{ alignSelf: "flex-start", fontFamily: "var(--font-mono)", fontSize: 13 }}
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+    </AuthShell>
   );
 }
