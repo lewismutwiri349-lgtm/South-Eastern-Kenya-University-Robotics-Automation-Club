@@ -17,7 +17,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   let project: Project;
   try {
-    const result = await apiFetch<{ data: Project }>(`/api/projects/${slug}`);
+    const result = await apiFetch<{ data: Project }>(`/api/projects/${encodeURIComponent(slug)}`);
     project = result.data;
   } catch {
     notFound();

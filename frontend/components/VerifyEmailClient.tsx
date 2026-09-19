@@ -2,10 +2,35 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { ApiError, apiFetch } from "@/lib/api";
 import { FormError } from "./form";
+import { ResendVerification } from "./ResendVerification";
 
-type Status = { kind: "verifying" } | { kind: "verified" } | { kind: "error"; message: string };
+type Status =
+  | { kind: "verifying" }
+  | { kind: "verified" }
+  // `canResend`: the token itself was the problem, so a fresh link helps.
+  // False for transient failures, where the same link is still good.
+  | { kind: "error"; message: string; canResend: boolean };
+
+function describeFailure(err: unknown): { message: string; canResend: boolean } {
+  if (err instanceof ApiError && err.code === "TOKEN_EXPIRED") {
+    return { message: "This verification link has expired.", canResend: true };
+  }
+  if (err instanceof ApiError && (err.code === "INVALID_TOKEN" || err.status === 400)) {
+    // Tokens are single-use, so a second click on an already-used link (or
+    // an email client pre-fetching it) lands here even though the account
+    // is verified — say so instead of implying something is broken.
+    return {
+      message: "This verification link is invalid or has already been used.",
+      canResend: true,
+    };
+  }
+  return {
+    message: "Couldn't verify your email right now. Please refresh this page to try again.",
+    canResend: false,
+  };
+}
 
 /**
  * The verification link in the email lands here with `?token=...`. The API
@@ -29,6 +54,7 @@ export function VerifyEmailClient({ token }: { token: string | null }) {
       setStatus({
         kind: "error",
         message: "This verification link is missing its token.",
+        canResend: true,
       });
       return;
     }
@@ -38,15 +64,7 @@ export function VerifyEmailClient({ token }: { token: string | null }) {
       body: JSON.stringify({ token }),
     })
       .then(() => setStatus({ kind: "verified" }))
-      .catch((err: unknown) => {
-        const badToken = err instanceof Error && err.message.includes("400");
-        setStatus({
-          kind: "error",
-          message: badToken
-            ? "This verification link is invalid or has expired."
-            : "Couldn't verify your email right now. Please try again in a moment.",
-        });
-      });
+      .catch((err: unknown) => setStatus({ kind: "error", ...describeFailure(err) }));
   }, [token]);
 
   if (status.kind === "verifying") {
@@ -61,9 +79,14 @@ export function VerifyEmailClient({ token }: { token: string | null }) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
         <FormError>{status.message}</FormError>
-        <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, margin: 0 }}>
-          <Link href="/register">Register again</Link> to get a fresh link.
-        </p>
+        {status.canResend && (
+          <>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0 }}>
+              Already verified? <Link href="/login">Sign in</Link>. Otherwise, request a new link:
+            </p>
+            <ResendVerification />
+          </>
+        )}
       </div>
     );
   }

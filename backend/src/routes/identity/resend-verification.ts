@@ -6,6 +6,7 @@ import {
   resendVerificationEmail,
 } from "../../services/identity/email-verification-service";
 import type { Env } from "../../types/env";
+import { identityRateLimit } from "../../middleware/identity-rate-limit";
 
 const resendVerificationSchema = z.object({
   email: z.string().email(),
@@ -15,6 +16,7 @@ export const resendVerificationRoute = new Hono<{ Bindings: Env }>();
 
 resendVerificationRoute.post(
   "/",
+  identityRateLimit,
   zValidator("json", resendVerificationSchema),
   async (c) => {
     const { email } = c.req.valid("json");

@@ -7,6 +7,7 @@ import { sendPasswordResetEmail } from "./email-service";
 import { revokeAllSessionsForUser } from "./session-service";
 import type { Env } from "../../types/env";
 import { recordIdentityAuditEvent } from "./audit-service";
+import { frontendUrl } from "../../lib/frontend-url";
 
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 60; // 1 hour — shorter than email
 // verification since a password reset link is more sensitive if leaked.
@@ -48,15 +49,15 @@ export async function requestPasswordReset(env: Env, email: string): Promise<voi
     createdAt: now,
   });
 
-  const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${rawToken}`;
-
   // Same reasoning as registration-service.ts: email delivery is
   // best-effort, not a blocking dependency. The route already returns a
   // generic "if that email exists..." response regardless of outcome, so
   // this also has to not throw, or that guarantee breaks.
   try {
+    const resetUrl = frontendUrl(env, `/reset-password?token=${rawToken}`);
     await sendPasswordResetEmail({
       apiKey: env.RESEND_API_KEY,
+      from: env.EMAIL_FROM,
       to: user.email,
       firstName: user.firstName,
       resetUrl,

@@ -2,10 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { ApiError, apiFetch } from "@/lib/api";
 import { Field, FormError, SubmitButton, fieldStyle } from "./form";
+import { ResendVerification } from "./ResendVerification";
 
-type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message: string };
+type Status =
+  | { kind: "idle" }
+  | { kind: "sending" }
+  | { kind: "error"; message: string; unverified: boolean };
 
 /**
  * Error copy maps the API's documented status codes (see
@@ -20,10 +24,10 @@ type Status = { kind: "idle" } | { kind: "sending" } | { kind: "error"; message:
  * the rest of the Identity module is careful to avoid.
  */
 function messageFor(err: unknown): string {
-  const text = err instanceof Error ? err.message : "";
-  if (text.includes("401")) return "That email and password don't match.";
-  if (text.includes("403")) return "Please verify your email address before signing in.";
-  if (text.includes("429")) return "Too many attempts. Please wait a while and try again.";
+  const status = err instanceof ApiError ? err.status : null;
+  if (status === 401) return "That email and password don't match.";
+  if (status === 403) return "Please verify your email address before signing in.";
+  if (status === 429) return "Too many attempts. Please wait a while and try again.";
   return "Couldn't sign in right now. Please try again in a moment.";
 }
 
@@ -50,7 +54,13 @@ export function LoginForm() {
       router.push("/account");
       router.refresh();
     } catch (err) {
-      setStatus({ kind: "error", message: messageFor(err) });
+      setStatus({
+        kind: "error",
+        message: messageFor(err),
+        // 403 is only ever EMAIL_NOT_VERIFIED on this route (the password
+        // was correct, or the API would have answered 401).
+        unverified: err instanceof ApiError && err.status === 403,
+      });
     }
   }
 
@@ -83,6 +93,10 @@ export function LoginForm() {
       </Field>
 
       {status.kind === "error" && <FormError>{status.message}</FormError>}
+
+      {status.kind === "error" && status.unverified && (
+        <ResendVerification initialEmail={email} />
+      )}
 
       <div>
         <SubmitButton onClick={handleSubmit} disabled={sending || !email || !password}>

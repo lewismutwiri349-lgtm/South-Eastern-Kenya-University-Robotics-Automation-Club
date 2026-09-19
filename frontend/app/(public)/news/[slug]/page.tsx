@@ -20,7 +20,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
 
   let article: Article;
   try {
-    const result = await apiFetch<{ data: Article }>(`/api/news/${slug}`);
+    const result = await apiFetch<{ data: Article }>(`/api/news/${encodeURIComponent(slug)}`);
     article = result.data;
   } catch {
     notFound();

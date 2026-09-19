@@ -32,7 +32,7 @@ export default async function ResourceDetailPage({
 
   let resource: Resource;
   try {
-    const result = await apiFetch<{ data: Resource }>(`/api/resources/${slug}`);
+    const result = await apiFetch<{ data: Resource }>(`/api/resources/${encodeURIComponent(slug)}`);
     resource = result.data;
   } catch {
     notFound();

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { getCookie, deleteCookie } from "hono/cookie";
 import { requireAuth } from "../../middleware/require-auth";
 import { revokeSession } from "../../services/identity/session-service";
-import { SESSION_COOKIE_NAME } from "../../services/identity/cookie-config";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../services/identity/cookie-config";
 import { recordIdentityAuditEvent } from "../../services/identity/audit-service";
 import type { Env, AuthVariables } from "../../types/env";
 
@@ -14,6 +14,6 @@ logoutRoute.post("/", requireAuth, async (c) => {
     await revokeSession(c.env, token);
   }
   await recordIdentityAuditEvent(c.env, { action: "logout", actorUserId: c.get("userId") });
-  deleteCookie(c, SESSION_COOKIE_NAME, { path: "/" });
+  deleteCookie(c, SESSION_COOKIE_NAME, sessionCookieOptions(c.env));
   return c.json({ data: { loggedOut: true } }, 200);
 });

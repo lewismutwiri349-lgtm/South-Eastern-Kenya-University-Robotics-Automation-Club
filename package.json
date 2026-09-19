@@ -11,7 +11,7 @@
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
     "db:generate": "npm run generate --workspace=database",
-    "db:migrate": "npm run migrate --workspace=database"
+    "db:migrate:local": "npm run db:migrate:local --workspace=backend"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

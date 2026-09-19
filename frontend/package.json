@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "clean": "node -e \"const fs=require('fs'); ['.next','.open-next','.wrangler'].forEach((d)=>fs.rmSync(d,{recursive:true,force:true}));\"",
-    "build": "npm run clean && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "cf:build": "npm run clean && opennextjs-cloudflare build",

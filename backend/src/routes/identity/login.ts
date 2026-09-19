@@ -8,7 +8,7 @@ import {
   InvalidCredentialsError,
   EmailNotVerifiedError,
 } from "../../services/identity/login-service";
-import { SESSION_COOKIE_NAME } from "../../services/identity/cookie-config";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../services/identity/cookie-config";
 import type { Env } from "../../types/env";
 import { identityRateLimit } from "../../middleware/identity-rate-limit";
 
@@ -21,10 +21,7 @@ loginRoute.post("/", identityRateLimit, zValidator("json", loginSchema), async (
     const { rawToken, expiresAt, userId, role } = await loginUser(c.env, input);
 
     setCookie(c, SESSION_COOKIE_NAME, rawToken, {
-      httpOnly: true,
-      secure: c.env.ENVIRONMENT !== "development",
-      sameSite: "Lax",
-      path: "/",
+      ...sessionCookieOptions(c.env),
       expires: expiresAt,
     });
 

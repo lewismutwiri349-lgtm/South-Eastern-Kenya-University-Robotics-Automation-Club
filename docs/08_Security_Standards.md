@@ -14,7 +14,16 @@ document is the checklist every feature is built against.
     instead, per the platform-constraint exception this rule already
     anticipated. Cost factor set in the Identity module's implementation.
 - Session tokens are short-lived, signed, stored in `httpOnly`, `Secure`,
-  `SameSite=Lax` cookies — never in `localStorage` (XSS-exposed).
+  `SameSite` cookies — never in `localStorage` (XSS-exposed).
+  - **Decision (2026-09-19):** `SameSite=Lax` when the API and frontend are
+    same-site (local dev), `SameSite=None; Secure` in staging/production.
+    The frontend and API are separate `*.workers.dev` Workers, which are
+    cross-*site* (`workers.dev` is a public suffix); browsers reject a
+    `Lax` cookie delivered on a cross-site `fetch()` response, so login
+    silently never established a session. See
+    `backend/src/services/identity/cookie-config.ts`. Serving both from one
+    registrable domain (custom domain) also makes the cookie first-party
+    for Safari/ITP, which blocks third-party cookies outright.
 - Refresh tokens rotate on use; a used/replayed refresh token invalidates
   the whole session family (detects token theft).
   - **Decision (2026-08-04, Identity module, Login slice):** Implemented as
@@ -68,8 +77,11 @@ document is the checklist every feature is built against.
   whitelisted origins (production frontend domain, staging domain, local
   dev). No wildcard `*` origins on authenticated routes.
 - **CSRF:** since auth uses cookies, state-changing routes (POST/PUT/PATCH/
-  DELETE) require either a CSRF token or rely on `SameSite=Lax` cookies plus
+  DELETE) require either a CSRF token or rely on `SameSite` cookies plus
   origin header verification as a second check.
+  - **Implemented (2026-09-19):** `middleware/require-origin.ts` rejects any
+    state-changing request whose `Origin` header is not `FRONTEND_URL`
+    (needed once the session cookie became `SameSite=None`).
 - **Rate limiting:** applied per-IP and per-account on sensitive routes
   (login, password reset, registration, application submission) using
   Cloudflare's native rate limiting where possible.

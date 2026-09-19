@@ -1,30 +1,41 @@
 import { Resend } from "resend";
 
 /**
- * NOTE: "from" address below uses Resend's shared sandbox domain
- * (onboarding@resend.dev), which only delivers to the account owner's own
- * verified email in Resend's test mode. A real sending domain must be
- * verified in Resend and this address updated before this reaches staging
- * — flagged here rather than silently shipped as if production-ready.
+ * Fallback sender: Resend's shared sandbox address, which only delivers to
+ * the Resend account owner's own verified email. Real users will not
+ * receive anything until a sending domain is verified in Resend and
+ * `EMAIL_FROM` is set (wrangler var) — see docs/modules/identity-auth.md.
  */
-const FROM_ADDRESS = "Robotics Club <onboarding@resend.dev>";
+const DEFAULT_FROM_ADDRESS = "Robotics Club <onboarding@resend.dev>";
+
+/** User-supplied text (first name) is interpolated into HTML emails. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 export async function sendVerificationEmail(params: {
   apiKey: string;
+  from?: string;
   to: string;
   firstName: string;
   verificationUrl: string;
 }): Promise<void> {
   const resend = new Resend(params.apiKey);
+  const url = escapeHtml(params.verificationUrl);
 
   const { error } = await resend.emails.send({
-    from: FROM_ADDRESS,
+    from: params.from || DEFAULT_FROM_ADDRESS,
     to: params.to,
     subject: "Verify your email — Robotics Club",
     html: `
-      <p>Hi ${params.firstName},</p>
+      <p>Hi ${escapeHtml(params.firstName)},</p>
       <p>Thanks for registering. Please verify your email address:</p>
-      <p><a href="${params.verificationUrl}">${params.verificationUrl}</a></p>
+      <p><a href="${url}">${url}</a></p>
       <p>This link expires in 24 hours.</p>
     `,
   });
@@ -36,20 +47,22 @@ export async function sendVerificationEmail(params: {
 
 export async function sendPasswordResetEmail(params: {
   apiKey: string;
+  from?: string;
   to: string;
   firstName: string;
   resetUrl: string;
 }): Promise<void> {
   const resend = new Resend(params.apiKey);
+  const url = escapeHtml(params.resetUrl);
 
   const { error } = await resend.emails.send({
-    from: FROM_ADDRESS,
+    from: params.from || DEFAULT_FROM_ADDRESS,
     to: params.to,
     subject: "Reset your password — Robotics Club",
     html: `
-      <p>Hi ${params.firstName},</p>
+      <p>Hi ${escapeHtml(params.firstName)},</p>
       <p>We received a request to reset your password. If this was you, click below:</p>
-      <p><a href="${params.resetUrl}">${params.resetUrl}</a></p>
+      <p><a href="${url}">${url}</a></p>
       <p>This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
     `,
   });

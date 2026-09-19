@@ -5,12 +5,11 @@ import { defineConfig } from "vitest/config";
 
 /**
  * Builds the migration list from `database/migrations/meta/_journal.json`
- * rather than `readD1Migrations()` against the raw directory. The
- * directory also contains `0000_bitter_maximus.sql` — an orphaned file not
- * tracked by the journal (flagged in `docs/modules/identity-auth.md` §6)
- * that `drizzle-kit`/`wrangler` never apply in any real environment. Using
- * the journal keeps the test database's schema identical to what
- * production actually runs.
+ * rather than `readD1Migrations()` against the raw directory, so
+ * the test database's schema is exactly what the journal — and therefore
+ * production — describes, even if a stray untracked .sql file ever
+ * reappears in the directory (a legacy orphan, `0000_bitter_maximus.sql`,
+ * was removed on 2026-09-19).
  */
 async function readJournalTrackedMigrations() {
   const { unstable_splitSqlQuery } = await import("wrangler");

@@ -5,6 +5,7 @@ import { generateToken, hashToken } from "./tokens";
 import type { Env } from "../../types/env";
 import { recordIdentityAuditEvent } from "./audit-service";
 import { sendVerificationEmail } from "./email-service";
+import { frontendUrl } from "../../lib/frontend-url";
 
 const VERIFICATION_TOKEN_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 
@@ -100,12 +101,11 @@ export async function resendVerificationEmail(
     createdAt: now,
   });
 
-  const verificationUrl =
-    `${env.FRONTEND_URL}/verify-email?token=${rawToken}`;
-
   try {
+    const verificationUrl = frontendUrl(env, `/verify-email?token=${rawToken}`);
     await sendVerificationEmail({
       apiKey: env.RESEND_API_KEY,
+      from: env.EMAIL_FROM,
       to: user.email,
       firstName: user.firstName,
       verificationUrl,

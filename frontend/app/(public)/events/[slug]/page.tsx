@@ -28,7 +28,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
 
   let event: Event;
   try {
-    const result = await apiFetch<{ data: Event }>(`/api/events/${slug}`);
+    const result = await apiFetch<{ data: Event }>(`/api/events/${encodeURIComponent(slug)}`);
     event = result.data;
   } catch {
     notFound();

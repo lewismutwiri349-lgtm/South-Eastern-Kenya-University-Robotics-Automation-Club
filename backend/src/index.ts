@@ -10,6 +10,7 @@ import { awardsRoutes } from "./routes/awards";
 import { galleryRoutes } from "./routes/gallery";
 import { resourcesRoutes } from "./routes/resources";
 import { contactRoutes } from "./routes/contact";
+import { requireAllowedOrigin } from "./middleware/require-origin";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -22,10 +23,15 @@ const app = new Hono<{ Bindings: Env }>();
 app.use(
   "*",
   cors({
-    origin: (origin, c) => (origin === c.env.FRONTEND_URL ? origin : null),
+    origin: (origin, c) =>
+      origin === c.env.FRONTEND_URL?.trim().replace(/\/+$/, "") ? origin : null,
     credentials: true,
   })
 );
+
+// The session cookie is SameSite=None when deployed (cross-site frontend),
+// so reject state-changing browser requests from any other origin.
+app.use("*", requireAllowedOrigin);
 
 app.route("/api/health", healthRoute);
 app.route("/api/identity", identityRoutes);

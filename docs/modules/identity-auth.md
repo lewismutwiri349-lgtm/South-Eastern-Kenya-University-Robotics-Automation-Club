@@ -110,8 +110,8 @@ listed per route.
   (`backend/vitest.config.mts`), which runs every test inside Miniflare
   against a local D1 instance migrated with the same journal-tracked
   migrations production uses (deliberately not `readD1Migrations()` against
-  the raw directory, which would also pick up the orphaned
-  `0000_bitter_maximus.sql` — see §6). Lives in `backend/tests/` (a new
+  the raw directory; the orphaned `0000_bitter_maximus.sql` that once made
+  that necessary was deleted on 2026-09-19 — see §6). Lives in `backend/tests/` (a new
   convention for this project — root-level `tests/` per
   `docs/10_Testing_Standards.md` §5 isn't used, since these tests need
   direct access to `backend/`'s Worker bindings and source tree):

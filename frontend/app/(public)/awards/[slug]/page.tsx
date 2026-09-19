@@ -22,7 +22,7 @@ export default async function AwardDetailPage({ params }: { params: Promise<{ sl
 
   let award: Award;
   try {
-    const result = await apiFetch<{ data: Award }>(`/api/awards/${slug}`);
+    const result = await apiFetch<{ data: Award }>(`/api/awards/${encodeURIComponent(slug)}`);
     award = result.data;
   } catch {
     notFound();

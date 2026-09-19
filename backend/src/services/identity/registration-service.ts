@@ -5,6 +5,7 @@ import { hashPassword } from "./password";
 import { generateToken, hashToken } from "./tokens";
 import { sendVerificationEmail } from "./email-service";
 import { recordIdentityAuditEvent } from "./audit-service";
+import { frontendUrl } from "../../lib/frontend-url";
 import type { Env } from "../../types/env";
 import type { RegisterInput } from "../../schemas/identity";
 
@@ -70,8 +71,6 @@ async function issueVerificationToken(
     createdAt: now,
   });
 
-  const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${rawToken}`;
-
   // Deliberate design decision (found while validating end-to-end,
   // 2026-08-08): email delivery is a best-effort side effect, not a
   // blocking dependency of account creation. If Resend is down or
@@ -79,12 +78,17 @@ async function issueVerificationToken(
   // registration because a third party is unreachable, while silently
   // leaving the row committed) was strictly worse: it returns 500 to a
   // user whose account was actually created. The verification token still
-  // exists in the database even if the email never sent; a "resend
-  // verification email" endpoint is the correct recovery path and belongs
-  // to a later slice, not invented here.
+  // exists in the database even if the email never sent; the recovery path
+  // is POST /api/identity/resend-verification (surfaced in the frontend on
+  // the verify-email page and after a 403 at sign-in).
   try {
+    // Built inside the try so a missing FRONTEND_URL is logged like any
+    // other delivery failure instead of failing a registration that already
+    // committed the account.
+    const verificationUrl = frontendUrl(env, `/verify-email?token=${rawToken}`);
     await sendVerificationEmail({
       apiKey: env.RESEND_API_KEY,
+      from: env.EMAIL_FROM,
       to: email,
       firstName,
       verificationUrl,

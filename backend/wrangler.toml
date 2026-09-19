@@ -14,19 +14,25 @@ ENVIRONMENT = "development"
 binding = "DB"
 database_name = "robotics-club-db-dev"
 database_id = "local-placeholder"
+migrations_dir = "../database/migrations"
 
 # STAGING
 
 [env.staging]
 name = "robotics-club-api-staging"
 
+# `[vars]` is NOT inherited into [env.*] blocks, so FRONTEND_URL must be set
+# here too — it drives both the CORS allow-list and the links in emails.
+# (Derived from the staging frontend's Worker name in frontend/wrangler.toml.)
 [env.staging.vars]
 ENVIRONMENT = "staging"
+FRONTEND_URL = "https://robotics-club-frontend-staging.seku.workers.dev"
 
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "robotics-club-db-staging"
 database_id = "staging-placeholder"
+migrations_dir = "../database/migrations"
 
 # PRODUCTION
 
@@ -36,8 +42,13 @@ name = "robotics-club-api-production"
 [env.production.vars]
 ENVIRONMENT = "production"
 FRONTEND_URL = "https://robotics-club-frontend-production.seku.workers.dev"
+# Secrets are never committed — set once per environment:
+#   npx wrangler secret put RESEND_API_KEY --env production
+# Once a sending domain is verified in Resend, add here (plain var, not secret):
+#   EMAIL_FROM = "Robotics Club <no-reply@your-verified-domain>"
 
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "robotics-club-db-production"
 database_id = "195f1422-3088-43ef-9133-8a449b5e6b95"
+migrations_dir = "../database/migrations"

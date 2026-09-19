@@ -37,20 +37,11 @@ Backend API (Wrangler local mode, on `http://localhost:8787`):
 npm run dev:backend
 ```
 
-First run only — create the local D1 database and apply every migration in
-ascending order:
+First run only — create the local D1 database and apply every migration:
 
 ```bash
-cd backend
-for f in ../database/migrations/0*.sql; do
-  npx wrangler d1 execute DB --local --file="$f"
-done
+npm run db:migrate:local
 ```
-
-Note: `database/migrations/0000_bitter_maximus.sql` is an orphaned file not
-tracked by `meta/_journal.json` and is never applied in any real
-environment. The loop above will pick it up — skip it, or apply only the
-tags listed in the journal.
 
 Frontend (on `http://localhost:3000`):
 
@@ -71,7 +62,7 @@ Run from the repo root:
 
 ```bash
 npx eslint .                              # lint, all three packages
-npm run --workspace=backend test          # 158 tests, real Workers runtime + local D1
+npm run --workspace=backend test          # 175 tests, real Workers runtime + local D1
 npx tsc --noEmit --project backend        # backend types
 npx tsc --noEmit --project frontend       # frontend types
 npm run --workspace=database generate     # should report no pending schema changes
@@ -80,6 +71,43 @@ npm run --workspace=database generate     # should report no pending schema chan
 Tests run in the real Workers runtime against a real local D1 via
 `@cloudflare/vitest-pool-workers` — not mocks. See
 [`docs/10_Testing_Standards.md`](docs/10_Testing_Standards.md).
+
+## Deploying
+
+Both Workers deploy to an explicit Wrangler environment (a bare
+`wrangler deploy` would use the localhost `FRONTEND_URL` and the placeholder
+D1 id). Run from the repo root.
+
+**Backend** (API + D1):
+
+```bash
+npx wrangler login                                            # once
+npm run --workspace=backend db:migrate:production             # apply pending D1 migrations
+cd backend && npx wrangler secret put RESEND_API_KEY --env production   # once per env
+cd .. && npm run --workspace=backend deploy                   # wrangler deploy --env production
+```
+
+**Frontend** (Next.js on OpenNext). `NEXT_PUBLIC_API_BASE_URL` is inlined at
+build time from `frontend/.env.production`, so build and deploy from a
+checkout where that file holds the real API URL:
+
+```bash
+npm run --workspace=frontend cf:deploy   # cf:build + opennextjs-cloudflare deploy --env production
+```
+
+Deploy the backend first: the frontend's emailed links and CORS both depend
+on `FRONTEND_URL` in `backend/wrangler.toml`, which must equal the frontend's
+real origin exactly (no trailing slash).
+
+**Email:** until a sending domain is verified in Resend, mail comes from
+Resend's sandbox sender and is only delivered to the Resend account owner.
+Verify a domain, then set `EMAIL_FROM` (see `backend/wrangler.toml`).
+
+**Cookies / Safari:** the session cookie is `SameSite=None; Secure` because
+the two Workers live on different `workers.dev` subdomains (cross-site).
+Safari blocks third-party cookies, so Safari users will not stay signed in
+until both Workers share one registrable domain (custom domain, e.g.
+`app.<domain>` + `api.<domain>`), after which nothing else needs to change.
 
 ## Before deploying
 

@@ -29,7 +29,7 @@ export default async function GalleryItemPage({ params }: { params: Promise<{ sl
 
   let item: GalleryItem;
   try {
-    const result = await apiFetch<{ data: GalleryItem }>(`/api/gallery/${slug}`);
+    const result = await apiFetch<{ data: GalleryItem }>(`/api/gallery/${encodeURIComponent(slug)}`);
     item = result.data;
   } catch {
     notFound();
