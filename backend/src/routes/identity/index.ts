@@ -1,3 +1,4 @@
+import { resendVerificationRoute } from "./resend-verification";
 import { Hono } from "hono";
 import type { Env, AuthVariables } from "../../types/env";
 import { registerRoute } from "./register";
@@ -13,6 +14,7 @@ export const identityRoutes = new Hono<{ Bindings: Env; Variables: AuthVariables
 
 identityRoutes.route("/register", registerRoute);
 identityRoutes.route("/verify-email", verifyEmailRoute);
+identityRoutes.route("/resend-verification", resendVerificationRoute);
 identityRoutes.route("/login", loginRoute);
 identityRoutes.route("/logout", logoutRoute);
 identityRoutes.route("/me", meRoute);
