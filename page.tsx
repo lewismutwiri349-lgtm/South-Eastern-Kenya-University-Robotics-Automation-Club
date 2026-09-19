@@ -28,7 +28,7 @@ export default function HomePage() {
   return (
     <main>
       <Container style={{ paddingTop: "var(--space-16)", paddingBottom: "var(--space-16)" }}>
-        <section
+        <div
           style={{
             display: "grid",
             gridTemplateColumns: "1.1fr 1fr",
@@ -38,14 +38,7 @@ export default function HomePage() {
         >
           <div>
             <Designator>RASC — EST. STUDENT-RUN ENGINEERING</Designator>
-            <h1
-              style={{
-                fontSize: 48,
-                lineHeight: 1.05,
-                marginTop: "var(--space-3)",
-                letterSpacing: "-0.02em",
-              }}
-            >
+            <h1 style={{ fontSize: 48, marginTop: "var(--space-3)", letterSpacing: "-0.02em" }}>
               We build robots that have to actually work.
             </h1>
             <p
@@ -53,82 +46,55 @@ export default function HomePage() {
                 fontSize: 18,
                 color: "var(--text-secondary)",
                 marginTop: "var(--space-4)",
-                maxWidth: 500,
+                maxWidth: 480,
               }}
             >
               Five divisions, one club. From first CAD sketch to competition floor, members ship
               real hardware and software, not class projects.
             </p>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "var(--space-3)",
-                marginTop: "var(--space-6)",
-              }}
-            >
+            <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-6)" }}>
               <Button href="/apply">Apply to join</Button>
               <Button href="/projects" variant="secondary">
                 View projects
               </Button>
             </div>
           </div>
-
           <div style={{ display: "flex", justifyContent: "center" }}>
             <CircuitTrace />
           </div>
-        </section>
+        </div>
       </Container>
 
       <Container style={{ paddingBottom: "var(--space-16)" }}>
-        <section>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "var(--space-2)",
-              marginBottom: "var(--space-6)",
-            }}
-          >
-            <Designator>WHAT WE DO</Designator>
-            <h2 style={{ fontSize: 32, margin: 0 }}>Engineering, built as a team.</h2>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: "var(--space-4)",
-            }}
-          >
-            {WHAT_WE_DO.map((item) => (
-              <Card key={item.id}>
-                <Designator>{item.id}</Designator>
-                <h3 style={{ fontSize: 18, marginTop: "var(--space-2)" }}>{item.title}</h3>
-                <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
-                  {item.body}
-                </p>
-              </Card>
-            ))}
-          </div>
-        </section>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "var(--space-4)",
+          }}
+        >
+          {WHAT_WE_DO.map((item) => (
+            <Card key={item.id}>
+              <Designator>{item.id}</Designator>
+              <h3 style={{ fontSize: 18, marginTop: "var(--space-2)" }}>{item.title}</h3>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
+                {item.body}
+              </p>
+            </Card>
+          ))}
+        </div>
       </Container>
 
       <Container style={{ paddingBottom: "var(--space-16)" }}>
-        <section>
-          <Card style={{ textAlign: "center", padding: "var(--space-12)" }}>
-            <Designator>JOIN THE NEXT CYCLE</Designator>
-            <h2 style={{ fontSize: 28, marginTop: "var(--space-2)" }}>
-              Applications for the fall term are open.
-            </h2>
-            <p style={{ color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
-              No prior robotics experience required — every division trains new members.
-            </p>
-            <div style={{ marginTop: "var(--space-6)" }}>
-              <Button href="/apply">Start your application</Button>
-            </div>
-          </Card>
-        </section>
+        <Card style={{ textAlign: "center", padding: "var(--space-12)" }}>
+          <h2 style={{ fontSize: 28 }}>Applications for the fall term are open.</h2>
+          <p style={{ color: "var(--text-secondary)", marginTop: "var(--space-2)" }}>
+            No prior robotics experience required — every division trains new members.
+          </p>
+          <div style={{ marginTop: "var(--space-6)" }}>
+            <Button href="/apply">Start your application</Button>
+          </div>
+        </Card>
       </Container>
     </main>
   );
