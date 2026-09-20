@@ -1,0 +1,15 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "robotics-club-frontend"
+main = ".open-next/worker.js"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[env.staging]
+name = "robotics-club-frontend-staging"
+
+[env.production]
+name = "robotics-club-frontend-production"

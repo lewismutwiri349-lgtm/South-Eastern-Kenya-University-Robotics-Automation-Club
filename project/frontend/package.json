@@ -1,0 +1,28 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "clean": "node -e \"const fs=require('fs'); ['.next','.open-next','.wrangler'].forEach((d)=>fs.rmSync(d,{recursive:true,force:true}));\"",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "cf:build": "npm run clean && opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy --env production"
+  },
+  "dependencies": {
+    "next": "^15.5.23",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "^1.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.0.0"
+  }
+}
