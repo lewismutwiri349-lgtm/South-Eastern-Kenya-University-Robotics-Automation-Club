@@ -1,4 +1,3 @@
-```ts
 import { eq } from "drizzle-orm";
 import { users, emailVerificationTokens, DEFAULT_USER_ROLE } from "../../../../database/schema";
 import { createDb } from "../../db/client";
@@ -125,4 +124,3 @@ async function issueVerificationToken(
     });
   }
 }
-```
