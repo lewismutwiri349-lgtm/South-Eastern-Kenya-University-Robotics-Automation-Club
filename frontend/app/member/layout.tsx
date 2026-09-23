@@ -63,6 +63,9 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
             <Link href="/member/achievements" className="text-gray-600 hover:text-gray-800">
               Achievements
             </Link>
+            <Link href="/member/projects" className="text-gray-600 hover:text-gray-800">
+              Projects
+            </Link>
           </div>
           <Link href="/account" className="text-sm text-gray-600 hover:text-gray-800">
             Settings

@@ -16,6 +16,12 @@ database_name = "robotics-club-db-dev"
 database_id = "local-placeholder"
 migrations_dir = "../database/migrations"
 
+# Project file storage (Phase 5). Buckets must exist before deploy:
+#   npx wrangler r2 bucket create robotics-club-files-dev   (and -staging / -production)
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "robotics-club-files-dev"
+
 # STAGING
 
 [env.staging]
@@ -33,6 +39,10 @@ binding = "DB"
 database_name = "robotics-club-db-staging"
 database_id = "staging-placeholder"
 migrations_dir = "../database/migrations"
+
+[[env.staging.r2_buckets]]
+binding = "FILES"
+bucket_name = "robotics-club-files-staging"
 
 # PRODUCTION
 
@@ -52,3 +62,7 @@ binding = "DB"
 database_name = "robotics-club-db-production"
 database_id = "195f1422-3088-43ef-9133-8a449b5e6b95"
 migrations_dir = "../database/migrations"
+
+[[env.production.r2_buckets]]
+binding = "FILES"
+bucket_name = "robotics-club-files-production"

@@ -3,6 +3,8 @@ import type { UserRole } from "../../../database/schema";
 /** Cloudflare Worker bindings available to every route/service. */
 export type Env = {
   DB: D1Database;
+  /** R2 bucket holding project files (Phase 5). One object per file version. */
+  FILES: R2Bucket;
   RESEND_API_KEY: string;
   FRONTEND_URL: string;
   /**

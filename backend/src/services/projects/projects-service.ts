@@ -4,6 +4,7 @@ import { createDb } from "../../db/client";
 import { slugify, disambiguateSlug } from "../../lib/slug";
 import type { Env } from "../../types/env";
 import type { CreateProjectInput, UpdateProjectInput } from "../../schemas/projects";
+import { setProjectTags } from "./project-search-service";
 
 export class ProjectNotFoundError extends Error {
   constructor() {
@@ -32,11 +33,14 @@ export async function createProject(
     summary: input.summary,
     body: input.body,
     coverImageUrl: input.coverImageUrl ?? null,
+    category: input.category ?? null,
+    githubUrl: input.githubUrl ?? null,
     ownerId,
     status: "draft",
     createdAt: now,
     updatedAt: now,
   });
+  if (input.tags?.length) await setProjectTags(env.DB, id, input.tags);
 
   return { id, slug };
 }
@@ -53,10 +57,12 @@ export async function updateProject(
     .where(and(eq(projects.id, projectId), isNull(projects.deletedAt)));
   if (!existing) throw new ProjectNotFoundError();
 
+  const { tags, ...fields } = input;
   await db
     .update(projects)
-    .set({ ...input, updatedAt: new Date() })
+    .set({ ...fields, updatedAt: new Date() })
     .where(eq(projects.id, projectId));
+  if (tags) await setProjectTags(env.DB, projectId, tags);
 }
 
 export async function publishProject(env: Env, projectId: string): Promise<void> {

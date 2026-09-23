@@ -10,6 +10,8 @@ import { awardsRoutes } from "./routes/awards";
 import { galleryRoutes } from "./routes/gallery";
 import { resourcesRoutes } from "./routes/resources";
 import { contactRoutes } from "./routes/contact";
+import { applicationsRouter } from "./routes/applications";
+import { membersRouter } from "./routes/members";
 import { requireAllowedOrigin } from "./middleware/require-origin";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -42,6 +44,8 @@ app.route("/api/awards", awardsRoutes);
 app.route("/api/gallery", galleryRoutes);
 app.route("/api/resources", resourcesRoutes);
 app.route("/api/contact", contactRoutes);
+app.route("/api/applications", applicationsRouter);
+app.route("/api/members", membersRouter);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 

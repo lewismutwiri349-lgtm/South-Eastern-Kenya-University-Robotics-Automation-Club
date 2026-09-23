@@ -16,6 +16,7 @@ function resolveApiBaseUrl(): string {
 }
 
 const API_BASE_URL = resolveApiBaseUrl();
+export { API_BASE_URL };
 
 /**
  * Non-2xx API response. `message` keeps the historical
@@ -62,4 +63,57 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   }
 
   return res.json() as Promise<T>;
+}
+
+/**
+ * Like `apiFetch`, but for `multipart/form-data` uploads. The browser must
+ * set its own `Content-Type` (with the multipart boundary), so this must
+ * NOT send the `application/json` header `apiFetch` always adds.
+ */
+export async function apiUpload<T>(path: string, form: FormData, init?: Omit<RequestInit, "body">): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    method: init?.method ?? "POST",
+    credentials: "include",
+    body: form,
+  });
+
+  if (!res.ok) {
+    let code: string | null = null;
+    let message = `API request failed: ${res.status} ${res.statusText}`;
+    try {
+      const body = (await res.json()) as { error?: { code?: unknown; message?: unknown } };
+      if (typeof body.error?.code === "string") code = body.error.code;
+      if (typeof body.error?.message === "string") message = body.error.message;
+    } catch {
+      // Non-JSON error body — status alone will do.
+    }
+    const err = new ApiError(res.status, res.statusText, code);
+    // Preserve the server's human-readable message where we have one.
+    (err as { message: string }).message = message;
+    throw err;
+  }
+
+  if (res.status === 204) return undefined as T;
+  return res.json() as Promise<T>;
+}
+
+/** The current session's user, per GET /api/identity/me. */
+export type CurrentUser = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  emailVerified: boolean;
+};
+
+/** Returns the signed-in user, or `null` if there's no valid session. Never throws. */
+export async function getMe(): Promise<CurrentUser | null> {
+  try {
+    const result = await apiFetch<{ data: CurrentUser }>("/api/identity/me");
+    return result.data;
+  } catch {
+    return null;
+  }
 }

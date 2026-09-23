@@ -28,6 +28,12 @@ export const projects = sqliteTable(
     // pipeline (docs/17_Feature_Roadmap.md Phase 5). Nullable: a project
     // can be listed before a cover image exists.
     coverImageUrl: text("cover_image_url"),
+    // Phase 5 (migration 0010). Tags, files and team assignments live in
+    // their own tables (project_tags, project_files, project_file_versions,
+    // member_projects) and are accessed with raw D1 statements, like the
+    // other Phase 3+ services.
+    category: text("category"),
+    githubUrl: text("github_url"),
     ownerId: text("owner_id")
       .notNull()
       .references(() => users.id),

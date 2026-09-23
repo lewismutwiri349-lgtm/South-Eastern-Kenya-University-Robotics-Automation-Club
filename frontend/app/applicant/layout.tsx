@@ -21,13 +21,13 @@ export default function ApplicantLayout({ children }: { children: React.ReactNod
         const user = await getMe();
 
         // Check role
-        if (user.role !== "applicant" && user.role !== "member") {
+        if (!user || (user.role !== "applicant" && user.role !== "member")) {
           router.push("/login");
           return;
         }
 
         // Check email verification
-        if (!user.emailVerifiedAt) {
+        if (!user.emailVerified) {
           router.push("/verify-email?redirect=/applicant");
           return;
         }

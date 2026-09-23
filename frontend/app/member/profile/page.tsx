@@ -18,8 +18,8 @@ interface Skill {
 }
 
 export default function ProfileEditPage() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<MemberProfile | null>(null);
+  const _router = useRouter();
+  const [_profile, setProfile] = useState<MemberProfile | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [bio, setBio] = useState("");
   const [division, setDivision] = useState("");
