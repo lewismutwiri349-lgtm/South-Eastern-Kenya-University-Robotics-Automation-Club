@@ -9,10 +9,12 @@ export const listUsersRoute = new Hono<{ Bindings: Env; Variables: AuthVariables
 
 /**
  * Minimal roster visibility for leadership — intentionally small (no
- * search/filter/pagination). Full user management belongs to the future
- * Admin dashboard module per docs/17_Feature_Roadmap.md Phase 6; this
- * exists now primarily to give requireRole a real consumer to prove the
- * auth + RBAC middleware chain works end to end, per docs/07_User_Roles.md §4.
+ * search/filter/pagination). Superseded for staff use by
+ * `GET /api/admin/users` (`docs/modules/admin-dashboard.md`), which adds
+ * pagination, filtering and search; this route is left in place rather
+ * than removed since retiring it wasn't part of that module's scope, and
+ * it still proves the auth + RBAC middleware chain end to end per
+ * `docs/07_User_Roles.md` §4.
  */
 listUsersRoute.get(
   "/",

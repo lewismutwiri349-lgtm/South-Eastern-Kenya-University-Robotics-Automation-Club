@@ -168,6 +168,23 @@ them. The 401 boundary on `GET` matters more here than elsewhere: the public
 can write to this table, so an accidental public read would expose every
 sender's email address. See `docs/modules/contact.md` §5.
 
+### Administration Domain (current)
+| Route | Allowed roles |
+|---|---|
+| `GET /api/admin/users` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary` |
+| `PATCH /api/admin/users/:id/role` | `super_admin`, `chairperson` |
+| `GET /api/admin/applications` | `super_admin`, `chairperson`, `vice_chairperson`, `secretary` |
+| `GET /api/admin/applications/:id` | Same |
+| `POST /api/admin/applications/:id/accept` | Same |
+| `POST /api/admin/applications/:id/reject` | Same |
+
+Role-granting is narrower than roster visibility: assigning a role is a
+governance decision, not routine admin work, so Vice Chairperson and
+Secretary can see the roster but not change roles on it. Secretary is
+included in the wider set because "membership administration" (this row)
+is part of that role's description above. An actor can never change their
+own role. See `docs/modules/admin-dashboard.md` §4.
+
 ## 5. Testing Requirement
 Per `docs/10_Testing_Standards.md` §3, every role-gated route needs tests
 asserting: unauthenticated → 401, authenticated-but-wrong-role → 403,

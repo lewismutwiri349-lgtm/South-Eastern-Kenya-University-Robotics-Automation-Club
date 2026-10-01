@@ -53,10 +53,16 @@ open; flagged in `docs/modules/events.md` §11.
 - [ ] GitHub link integration
 
 ## Phase 6 — Admin Dashboard
-- [ ] User management, applicant management
+- [x] User management, applicant management — `docs/modules/admin-dashboard.md`
 - [ ] Project moderation (flag/hide/request changes/approve)
-- [ ] Division, News, Event, Awards, Certificate management
+- [ ] Division, News, Event, Awards management
 - [ ] Reports, analytics, audit log viewer, system settings
+
+**Scope note — "Certificate management".** Removed from this list: it
+conflicted with `database/schema/awards.ts`'s comment (and
+`docs/modules/awards.md`) explicitly reserving certificates for Phase 8.
+Confirmed with the project owner; see `docs/modules/admin-dashboard.md`
+§1.
 
 ## Phase 7 — Leadership Dashboard
 - [ ] Division Head / Project Leader views

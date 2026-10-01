@@ -20,12 +20,19 @@ import { defineConfig } from "vitest/config";
  * a test (rather than listing every migration in this one binding) hits an
  * RPC message-size crash in this pool-workers setup, so this is the only
  * place that list is assembled.
+ *
+ * 0011_admin_dashboard follows the same hand-written convention (Phase 6,
+ * Administration domain) — `drizzle-kit generate` can't be trusted to
+ * diff correctly against a journal that stops at 0006 while the schema
+ * has moved on via 0007-0010, so it was written by hand rather than risk
+ * a generated migration that redeclares tables that already exist.
  */
 const HAND_WRITTEN_MIGRATIONS = [
   "0007_polite_garia",
   "0008_seed_test_questions",
   "0009_member_portal",
   "0010_project_management",
+  "0011_admin_dashboard",
 ];
 
 async function readJournalTrackedMigrations() {

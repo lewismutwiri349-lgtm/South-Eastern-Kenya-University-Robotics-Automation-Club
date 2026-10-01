@@ -13,3 +13,4 @@ export * from "./gallery";
 export * from "./resources";
 export * from "./contact";
 export * from "./applications";
+export * from "./administration";

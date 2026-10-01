@@ -12,6 +12,7 @@ import { resourcesRoutes } from "./routes/resources";
 import { contactRoutes } from "./routes/contact";
 import { applicationsRouter } from "./routes/applications";
 import { membersRouter } from "./routes/members";
+import { adminRouter } from "./routes/admin";
 import { requireAllowedOrigin } from "./middleware/require-origin";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -46,6 +47,7 @@ app.route("/api/resources", resourcesRoutes);
 app.route("/api/contact", contactRoutes);
 app.route("/api/applications", applicationsRouter);
 app.route("/api/members", membersRouter);
+app.route("/api/admin", adminRouter);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 
